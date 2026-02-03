@@ -1,0 +1,22 @@
+﻿from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+
+    APP_NAME: str = 'GymUnity API'
+    CORS_ORIGINS: list[str] = ['http://localhost:3000']
+    ENV: str = 'dev'
+    DATABASE_URL: str = 'sqlite:///./gymunity.db'
+    JWT_SECRET: str = 'change_me'
+    JWT_ALG: str = 'HS256'
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
+
+    @field_validator('CORS_ORIGINS', mode='before')
+    @classmethod
+    def parse_cors_origins(cls, value):
+        if isinstance(value, str):
+            return [item.strip() for item in value.split(',') if item.strip()]
+        return value
+
+settings = Settings()
