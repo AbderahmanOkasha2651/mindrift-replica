@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/Button';
 import { ApiUser, login, me } from '../src/lib/api';
@@ -30,67 +30,114 @@ export const Login: React.FC<LoginProps> = ({ onBack, onSubmit }) => {
     }
   };
 
+  const themeVars: React.CSSProperties = {
+    '--primary': '#10B981',
+    '--primary-hover': '#059669',
+    '--text': '#0F172A',
+    '--muted': '#64748B',
+    '--border': '#E2E8F0',
+    '--bg': '#FFFFFF',
+    '--surface': '#FFFFFF',
+    '--warm-accent': '#F1B542',
+    '--page': '#da9c43',
+  } as React.CSSProperties;
+
   return (
-    <div className="relative w-full min-h-screen overflow-hidden bg-black">
-      <div className="absolute inset-0 z-0">
-        <img
-          src="https://images.unsplash.com/photo-1517832207067-4db24a2ae47c?q=80&w=2400&auto=format&fit=crop"
-          alt="Gym equipment"
-          className="object-cover w-full h-full opacity-75"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/85"></div>
-        <div className="absolute inset-0 bg-black/35"></div>
-      </div>
+    <div className="h-screen w-full bg-[var(--page)] text-[var(--text)]" style={themeVars}>
+      <div className="flex h-full flex-col overflow-hidden md:flex-row">
+        {/* Image column (left) */}
+        <div className="relative hidden h-full w-[45%] min-w-[340px] md:block">
+          <img
+            src="/Login%20Image.jpg"
+            alt="GymUnity welcome illustration"
+            className="h-full w-full object-cover object-center"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(241,181,66,0.35),transparent_50%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[rgba(0,0,0,0.05)] via-transparent to-[rgba(0,0,0,0.12)]" />
+        </div>
 
-      <div className="relative z-10 flex items-center justify-center w-full min-h-screen px-4 pt-24 pb-12">
-        <div className="w-full max-w-md p-6 sm:p-8 bg-white/10 border border-white/20 rounded-3xl backdrop-blur-md shadow-[0_0_40px_rgba(0,0,0,0.45)]">
-          <p className="mb-2 text-xs font-medium tracking-[0.35em] text-white/60 uppercase">
-            Welcome back
-          </p>
-          <h1 className="mb-6 text-3xl font-semibold text-white">
-            Sign in
-          </h1>
-
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="block mb-2 text-sm font-medium text-white/80">Email address</label>
-              <input
-                type="email"
-                placeholder="you@email.com"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                className="w-full px-4 py-3 text-sm text-white bg-white/10 border border-white/20 rounded-xl placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-mindrift-green/60 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block mb-2 text-sm font-medium text-white/80">Password</label>
-              <input
-                type="password"
-                placeholder="Your password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className="w-full px-4 py-3 text-sm text-white bg-white/10 border border-white/20 rounded-xl placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-mindrift-green/60 focus:border-transparent"
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full py-3 text-base !bg-mindrift-green !hover:bg-mindrift-greenHover">
-              Sign in
-            </Button>
-            {error && <p className="text-sm text-red-300">{error}</p>}
-            <div className="flex items-center justify-between pt-2">
-              <button
-                type="button"
-                onClick={onBack}
-                className="text-sm text-white/70 hover:text-white transition-colors"
+        {/* Form column (right) */}
+        <div className="flex h-full flex-1 flex-col overflow-y-auto bg-[var(--surface)] px-6 py-8 md:px-14 md:py-12">
+          <div className="mx-auto flex w-full max-w-[520px] flex-col gap-8 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 shadow-sm md:p-10">
+            <div className="flex items-center gap-3">
+              <Link
+                to="/"
+                aria-label="Go to home"
+                className="flex items-center gap-2 transition hover:opacity-90"
+                title="Back to home"
               >
-                Back to home
-              </button>
-              <Link to="/register" className="text-xs text-white/50 hover:text-white/80 transition-colors">
-                New here? Create an account
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)] font-bold">
+                  G
+                </div>
+                <span className="text-lg font-semibold text-[var(--text)]">GymUnity</span>
               </Link>
             </div>
-          </form>
+
+            <div className="space-y-2">
+              <p className="text-3xl font-bold leading-tight text-[var(--text)]">Welcome to GymUnity</p>
+              <p className="text-sm font-medium text-[var(--muted)]">Log in to access your projects</p>
+            </div>
+
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-[var(--text)]">Email address</label>
+                <input
+                  type="email"
+                  placeholder="you@email.com"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3.5 text-base text-[var(--text)] shadow-sm placeholder:text-[var(--muted)] focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-[var(--text)]">Password</label>
+                <input
+                  type="password"
+                  placeholder="Your password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3.5 text-base text-[var(--text)] shadow-sm placeholder:text-[var(--muted)] focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+                  required
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full rounded-xl bg-[var(--primary)] py-3.5 text-base font-semibold text-white shadow-[0_10px_30px_rgba(16,185,129,0.25)] transition hover:bg-[var(--primary-hover)] active:scale-[0.99] disabled:opacity-60 disabled:shadow-none"
+              >
+                Sign in
+              </Button>
+              {error && <p className="text-sm text-red-500">{error}</p>}
+
+              <div className="flex items-center justify-between pt-1 text-sm text-[var(--muted)]">
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="font-medium text-[var(--primary)] transition hover:underline hover:text-[var(--primary-hover)]"
+                >
+                  Back to home
+                </button>
+                <Link
+                  to="/register"
+                  className="text-[var(--primary)] font-medium transition hover:underline hover:text-[var(--primary-hover)]"
+                >
+                  New here? Create an account
+                </Link>
+              </div>
+            </form>
+
+            <div className="text-xs text-[var(--muted)]">
+              Any questions?{' '}
+              <a
+                className="font-semibold text-[var(--primary)] hover:text-[var(--primary-hover)] hover:underline"
+                href="mailto:support@gymunity.ai"
+              >
+                Help
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
