@@ -7,9 +7,9 @@ import { ApiUser } from '../src/lib/api';
 const NAV_ITEMS: NavItem[] = [
   { label: 'How it works', href: '#', hasNotification: true },
   { label: 'Blog', href: '#' },
-  { label: 'Community', href: '#' },
-  { label: 'About Us', href: '#' },
-  { label: 'FAQ', href: '#' },
+  { label: 'AI Coach', href: '/ai-coach' },
+  { label: 'News', href: '/news' },
+  { label: 'Store', href: '/store' },
 ];
 
 interface NavbarProps {
@@ -19,9 +19,23 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ currentUser, onLogout }) => {
   const displayName = currentUser?.name?.trim() || 'there';
+  const [scrolled, setScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const navSkin = scrolled
+    ? 'bg-black/75 backdrop-blur-xl border-b border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.35)]'
+    : 'bg-transparent';
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 md:px-12 lg:px-16">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 md:px-12 lg:px-16 transition-colors duration-300 ${navSkin}`}
+    >
       {/* Logo Area */}
       <Link to="/" className="flex items-center gap-2 cursor-pointer">
         {/* Simple SVG Logo Approximation */}
@@ -37,47 +51,18 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUser, onLogout }) => {
       {/* Desktop Navigation */}
       <div className="hidden lg:flex items-center gap-8">
         {NAV_ITEMS.map((item) => (
-          <a
+          <Link
             key={item.label}
-            href={item.href}
+            to={item.href}
             className="relative text-[15px] font-medium text-white/90 hover:text-white transition-colors"
           >
             {item.label}
             {item.hasNotification && (
               <span className="absolute -top-1 -right-2.5 w-1.5 h-1.5 bg-[#FF4D4D] rounded-full"></span>
             )}
-          </a>
+          </Link>
         ))}
-        <div className="relative group">
-          <button
-            type="button"
-            className="text-[15px] font-medium text-white/90 hover:text-white transition-colors"
-          >
-            Services
-          </button>
-          <div className="absolute left-1/2 top-full z-50 mt-3 w-56 -translate-x-1/2 opacity-0 transition-all duration-200 group-hover:opacity-100">
-            <div className="rounded-2xl border border-white/10 bg-black/80 p-3 backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.4)]">
-              <Link
-                to="/ai-plan"
-                className="block rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-colors"
-              >
-                Create plan with AI
-              </Link>
-              <Link
-                to="/news"
-                className="block rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-colors"
-              >
-                News
-              </Link>
-              <Link
-                to="/store"
-                className="block rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition-colors"
-              >
-                Store
-              </Link>
-            </div>
-          </div>
-        </div>
+        {/* Services dropdown removed to place items directly in the nav as requested */}
       </div>
 
       {/* Right Actions */}

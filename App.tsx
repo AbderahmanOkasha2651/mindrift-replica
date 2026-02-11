@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { ProductsSection } from './components/ProductsSection';
 import { SellerDashboard } from './components/SellerDashboard';
@@ -9,7 +9,15 @@ import { Home } from './src/pages/Home';
 import { LoginPage } from './src/pages/LoginPage';
 import { RegisterPage } from './src/pages/RegisterPage';
 import { Dashboard } from './src/pages/Dashboard';
+import { AICoach } from './src/pages/AICoach';
 import { ProtectedRoute } from './src/components/ProtectedRoute';
+import { AdminRoute } from './src/components/AdminRoute';
+import { NewsFeedPage } from './src/pages/NewsFeedPage';
+import { NewsExplorePage } from './src/pages/NewsExplorePage';
+import { NewsPreferencesPage } from './src/pages/NewsPreferencesPage';
+import { NewsArticlePage } from './src/pages/NewsArticlePage';
+import { NewsChatPage } from './src/pages/NewsChatPage';
+import { AdminNewsPage } from './src/pages/AdminNewsPage';
 import { ApiUser } from './src/lib/api';
 
 const readStoredUser = (): ApiUser | null => {
@@ -29,6 +37,7 @@ const readStoredUser = (): ApiUser | null => {
 
 const App: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [products, setProducts] = React.useState<Product[]>(() => loadProducts());
   const [currentUser, setCurrentUser] = React.useState<ApiUser | null>(() => readStoredUser());
 
@@ -74,9 +83,11 @@ const App: React.FC = () => {
     ]);
   };
 
+  const hideNavbar = location.pathname === '/login';
+
   return (
     <main className="min-h-screen bg-black text-white">
-      <Navbar currentUser={currentUser} onLogout={handleLogout} />
+      {!hideNavbar && <Navbar currentUser={currentUser} onLogout={handleLogout} />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
@@ -90,29 +101,59 @@ const App: React.FC = () => {
           }
         />
         <Route
-          path="/ai-plan"
+          path="/ai-coach"
           element={
-            <div className="px-6 pt-28 pb-16 sm:px-10 lg:px-16">
-              <div className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
-                <h1 className="text-3xl font-semibold text-white">Create plan with AI</h1>
-                <p className="mt-3 text-sm text-white/70">
-                  صفحة مبدئية. هنا هنضيف مولد خطط التمرين بالذكاء الاصطناعي.
-                </p>
-              </div>
-            </div>
+            <ProtectedRoute onAuthenticated={syncUser}>
+              <AICoach />
+            </ProtectedRoute>
           }
         />
         <Route
           path="/news"
           element={
-            <div className="px-6 pt-28 pb-16 sm:px-10 lg:px-16">
-              <div className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
-                <h1 className="text-3xl font-semibold text-white">News</h1>
-                <p className="mt-3 text-sm text-white/70">
-                  صفحة مبدئية للأخبار والتحديثات الخاصة بـ GymUnity.
-                </p>
-              </div>
-            </div>
+            <ProtectedRoute onAuthenticated={syncUser}>
+              <NewsFeedPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/news/explore"
+          element={
+            <ProtectedRoute onAuthenticated={syncUser}>
+              <NewsExplorePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/news/preferences"
+          element={
+            <ProtectedRoute onAuthenticated={syncUser}>
+              <NewsPreferencesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/news/article/:id"
+          element={
+            <ProtectedRoute onAuthenticated={syncUser}>
+              <NewsArticlePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/news/chat"
+          element={
+            <ProtectedRoute onAuthenticated={syncUser}>
+              <NewsChatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/news"
+          element={
+            <AdminRoute onAuthenticated={syncUser}>
+              <AdminNewsPage />
+            </AdminRoute>
           }
         />
         <Route

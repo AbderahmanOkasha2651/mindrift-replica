@@ -1,4 +1,4 @@
-﻿export const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
 
 export interface RegisterPayload {
   name: string;
@@ -25,6 +25,17 @@ export interface ApiUser {
   created_at: string;
 }
 
+/** Custom error that carries an HTTP status (when available). */
+export class ApiError extends Error {
+  status?: number;
+
+  constructor(message: string, status?: number, options?: ErrorOptions) {
+    super(message, options);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
 const getAuthHeader = (): Record<string, string> => {
   if (typeof window === 'undefined') {
     return {};
@@ -37,18 +48,36 @@ const getAuthHeader = (): Record<string, string> => {
 };
 
 const request = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
-  const response = await fetch(`${BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeader(),
-      ...(options.headers ?? {}),
-    },
-    ...options,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${BASE_URL}${path}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader(),
+        ...(options.headers ?? {}),
+      },
+      ...options,
+    });
+  } catch (err) {
+    // Network/connection level failure (server down, CORS, offline, etc.)
+    throw new ApiError('تعذّر الاتصال بالسيرفر، حاول مجدداً.', undefined, { cause: err });
+  }
 
   if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || 'Request failed');
+    let message = 'Request failed';
+    try {
+      const data = (await response.json()) as { detail?: unknown };
+      if (data?.detail) {
+        message = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+      }
+    } catch {
+      const text = await response.text();
+      if (text) {
+        message = text;
+      }
+    }
+    throw new ApiError(message, response.status);
   }
 
   return response.json() as Promise<T>;

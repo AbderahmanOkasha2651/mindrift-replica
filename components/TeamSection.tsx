@@ -1,66 +1,178 @@
 import React from 'react';
 
-const PEOPLE = [
+type TeamMember = {
+  name: string;
+  title: string;
+  quote: string;
+  image: string;
+  accent: string;
+  doodle: string;
+};
+
+const TEAM_MEMBERS: TeamMember[] = [
+  
   {
-    name: 'Karim',
-    title: 'Strength Coach',
-    quote:
-      'GymUnity helps me share training methods that keep athletes consistent and focused.',
-    image:
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=900&auto=format&fit=crop',
-    bg: 'bg-[#10C46E]',
+    name: 'Abderahman Okasha',
+    title: 'Data/Backend Engineer',
+    quote: 'Keeps our data pipelines clean and backend APIs reliable so the AI experience stays fast.',
+    image: 'public/abderahman-okasha.jpg',
+    accent: 'bg-[#B37CFF]',
+    doodle: 'text-[#E6D8FF]',
+  },
+  
+  {
+    name: 'Ahmed Oraby',
+    title: 'AI Developer',
+    quote: 'Builds and fine-tunes the AI that powers smarter coaching for every athlete.',
+    image: '/ahmed-oraby.jpg',
+    accent: 'bg-[#6AD2FF]',
+    doodle: 'text-[#D8F3FF]',
   },
   {
-    name: 'Mona',
-    title: 'Nutrition Specialist',
-    quote:
-      'Every plan we build is grounded in real-world coaching and daily habits.',
-    image:
-      'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?q=80&w=900&auto=format&fit=crop',
-    bg: 'bg-[#4DA6FF]',
+    name: 'Youssef Tamer',
+    title: 'Mobile Developer',
+    quote: 'Brings the GymUnity experience to your pocket with fast, reliable mobile apps.',
+    image: '/youssef-tamer.jpg',
+    accent: 'bg-[#FF9F6E]',
+    doodle: 'text-[#FFE1D2]',
   },
   {
-    name: 'Omar',
-    title: 'Performance Analyst',
-    quote:
-      'Tracking progress and recovery data makes training feel purposeful and smart.',
-    image:
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=900&auto=format&fit=crop',
-    bg: 'bg-[#F4B23A]',
+    name: 'Ismaeel Abdelmaqsoud',
+    title: 'ML Engineer',
+    quote: 'Designs and optimizes models so the coaching stays smart, fast, and reliable.',
+    image: '/ismaeel-abdelmaqsoud.jpg',
+    accent: 'bg-[#9B8CFF]',
+    doodle: 'text-[#E6E0FF]',
   },
 ];
 
-export const TeamSection: React.FC = () => {
-  return (
-    <section className="w-full bg-[#F6EFE7] text-[#1E1E1E]">
-      <div className="mx-auto max-w-6xl px-6 py-20 lg:px-16">
-        <h2 className="text-4xl font-semibold leading-tight text-[#1E1E1E]">
-          Meet the minds
-          <br />
-          behind GymUnity
-        </h2>
+const cardMarqueeStyles = `
+@keyframes teamCardsMarquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+.team-cards__scroller {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.team-cards__track {
+  display: flex;
+  gap: 1.25rem;
+  width: max-content;
+  will-change: transform;
+  animation: teamCardsMarquee var(--card-speed, 40s) linear infinite;
+}
+.team-cards__card {
+  width: min(320px, 86vw);
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+@media (prefers-reduced-motion: reduce) {
+  .team-cards__track {
+    animation: none !important;
+  }
+  .team-cards__scroller {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+}
+`;
 
-        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {PEOPLE.map((person) => (
-            <div key={person.name} className="overflow-hidden rounded-[28px] border border-black/10 bg-white">
-              <div className={`relative h-56 ${person.bg}`}>
-                <img
-                  src={person.image}
-                  alt={person.name}
-                  className="h-full w-full object-cover grayscale"
-                />
-              </div>
-              <div className="space-y-3 p-6">
-                <div>
-                  <p className="text-base font-semibold text-[#1E1E1E]">{person.name}</p>
-                  <p className="text-sm text-[#4D443C]">{person.title}</p>
-                </div>
-                <p className="text-sm leading-relaxed text-[#4D443C]">
-                  {person.quote}
-                </p>
-              </div>
+export const TeamSection: React.FC = () => {
+  const sectionRef = React.useRef<HTMLElement | null>(null);
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={sectionRef} className="w-full bg-[#F5EFE8] px-6 py-20 text-[#222326] sm:px-10 lg:px-16">
+      <div className="mx-auto max-w-7xl">
+        <style>{cardMarqueeStyles}</style>
+
+        <div
+          className={`transition-all duration-700 ease-out ${
+            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}
+        >
+          <h2 className="max-w-xl text-4xl font-semibold leading-[1.05] sm:text-6xl">
+            Meet the minds
+            <br />
+            behind the AI
+          </h2>
+        </div>
+
+        <div className="mt-12">
+          <div className="team-cards__scroller">
+            {/* Two identical tracks back-to-back create a seamless loop */}
+            <div
+              className="team-cards__track"
+              style={{ ['--card-speed' as string]: '42s' }}
+            >
+              {[...TEAM_MEMBERS, ...TEAM_MEMBERS].map((person, index) => (
+                <article
+                  key={`${person.name}-${index}`}
+                  className={`team-cards__card transition-all duration-700 ease-out ${
+                    isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                  }`}
+                  style={{ transitionDelay: `${120 + (index % TEAM_MEMBERS.length) * 140}ms` }}
+                >
+                  <div className="rounded-[30px] bg-[#F2ECE6] p-2">
+                    <div
+                      className={`relative h-72 w-full overflow-hidden rounded-[26px] ${person.accent}`}
+                      aria-hidden="true"
+                    >
+                      {/* Colored frame padding; inner wrapper clips the photo to match the radius */}
+                      <div className="absolute inset-[10px] overflow-hidden rounded-[22px] bg-white/5">
+                        <svg
+                          viewBox="0 0 100 100"
+                          className={`absolute inset-0 h-full w-full ${person.doodle}`}
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path d="M8 24C24 10 36 10 46 24C56 38 66 38 92 18" stroke="currentColor" strokeWidth="1.2" />
+                          <path d="M12 68C22 58 28 54 36 56C44 58 52 72 64 76C72 78 80 76 90 66" stroke="currentColor" strokeWidth="1.2" />
+                        </svg>
+                        <img
+                          src={person.image}
+                          alt={person.name}
+                          className="h-full w-full object-cover grayscale"
+                          loading="lazy"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-[30px] border border-black/10 bg-[#F2ECE6] p-8 shadow-[0_4px_12px_rgba(15,18,22,0.06)]">
+                    <p className="text-3xl font-semibold leading-none">{person.name}</p>
+                    <p className="mt-2 text-2xl text-[#2D2F33]">{person.title}</p>
+                    <p className="mt-8 text-lg leading-[1.45] text-[#32343A]">{person.quote}</p>
+                  </div>
+                </article>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>

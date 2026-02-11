@@ -8,7 +8,7 @@ export const Hero: React.FC = () => {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://media.istockphoto.com/id/1755727979/photo/mature-man-in-a-cycling-class-at-the-gym.webp?a=1&b=1&s=612x612&w=0&k=20&c=KvELyE0tTejN1ZuYq61j6srld0z_ox_A_M8yjLTyrDo=" 
+          src="https://images.unsplash.com/photo-1578924608828-79a71150f711?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGZpdG5lc3MlMjBtYW58ZW58MHwwfDB8fHww" 
           alt="Person working on laptop" 
           className="object-cover w-full h-full opacity-90"
         />

@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { ApiUser, me } from '../lib/api';
+import { ApiError, ApiUser, me } from '../lib/api';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -34,6 +34,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         return;
       }
 
+      // Optimistic allow while we verify token to avoid logging users out on transient errors.
+      if (isActive) {
+        setIsAllowed(true);
+      }
+
       try {
         const user = await me();
         if (!isActive) {
@@ -46,9 +51,16 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         if (!isActive) {
           return;
         }
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user');
-        setIsAllowed(false);
+        const shouldLogout = error instanceof ApiError && error.status === 401;
+        if (shouldLogout) {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('user');
+          setIsAllowed(false);
+        } else {
+          // Keep the session; likely a network/server hiccup.
+          console.error('Session check failed:', error);
+          setIsAllowed(true);
+        }
       } finally {
         if (isActive) {
           setIsChecking(false);
